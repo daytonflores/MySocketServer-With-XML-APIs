@@ -12,7 +12,7 @@ endif
 #	 Example 1 : If Makefile resides in ..Project and header files reside in ..Project, then value here would be left empty
 #	 Example 2 : If Makefile resides in ..Project and header files reside in ..Project/headers, then value here would be "-Iheaders" without quotes
 #	 Example 3 : If Makefile resides in ..Project/source and header files reside in ..Project/headers, then value here would be "-I../headers" without quotes
-HDIR= -I../headers
+HDIR= -I../include
 
 # Source Directory
 #	 Example 1 : If Makefile resides in ..Project and source files reside in ..Project/source, then value here would be "-Isrc" without quotes

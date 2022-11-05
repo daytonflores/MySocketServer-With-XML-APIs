@@ -7,35 +7,25 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define BUF_SIZE					(1024)
+#include "../include/pugiconfig.hpp"
+#include "../include/pugixml.hpp"
+#include "../include/MySocketClient.h"
+#include "../include/MySocketServer.h"
+
 #define DEFAULT_SOCKET_SERVER_ADDR	("127.0.0.1")
 #define DEFAULT_SOCKET_SERVER_PORT	(5000)
-//#define EXIT_FAILURE				(1)
-#define EXIT_FAILURE_N				(-1)
-//#define EXIT_SUCCESS				(0)
 #define MAX_NUM_OF_ARGS				(2 + 1)
-#define NI_NONE						(0)
 
 using namespace std;
 
 int main(int argc, char* argv[]){
 
-	char buf[BUF_SIZE];
-	char host[NI_MAXHOST];
-	char service[NI_MAXSERV];
-	char* rc_charptr;
-	int bytes_received;
 	int rc_int;
-	int socket_client_fd;
-	int socket_server_fd;
-	int socket_server_port;
-	sockaddr_in socket_client;
-	sockaddr_in socket_server;
-	socklen_t socket_client_size;
-	string socket_server_addr;
+	MySocketServer destination;
+	MySocketClient source;
 
 	/**
-	 * Set socket server port and address based on command line arguments
+	 * Set Socket Server port and address based on command line arguments
 	 *		- Port must be integer so it can be passed to htons
 	 *		- Address must be string so it can be passed to inet_pton
 	 */
@@ -44,166 +34,136 @@ int main(int argc, char* argv[]){
 		return EXIT_FAILURE;
 	}
 	else if (argc == MAX_NUM_OF_ARGS) {
-		socket_server_addr = argv[1];
-		socket_server_port = stoi(argv[2]);
+		destination.set_address(argv[1]);
+		destination.set_port(stoi(argv[2]));
 	}
 	else if (argc > 1) {
-		socket_server_addr = argv[1];
-		socket_server_port = DEFAULT_SOCKET_SERVER_PORT;
+		destination.set_address(argv[1]);
+		destination.set_port(DEFAULT_SOCKET_SERVER_PORT);
 	}
 	else {
-		socket_server_addr = DEFAULT_SOCKET_SERVER_ADDR;
-		socket_server_port = DEFAULT_SOCKET_SERVER_PORT;
-	}
-
-	cout << "Using socket server address " << socket_server_addr << " with port " << socket_server_port << "!" << endl;
-
-	/**
-	 * Create socket server
-	 *		- Domain of AF_INET for IPv4 Internet protocols
-	 *		- Type of SOCK_STREAM for TCP (sequenced, reliable, two-way,
-	 *		  connection-based byte streams)
-	 *		- Protocol of 0 because only 1 protocol exists to support SOCK_STREAM
-	 *		- If socket is successful, socket file descriptor will be returned
-	 */
-	rc_int = socket(AF_INET, SOCK_STREAM, 0);
-
-	if (rc_int == EXIT_FAILURE_N) {
-		cerr << "FAILURE: Could not create socket server..." << endl;
-		return EXIT_FAILURE;
-	}
-	else {
-		cout << "SUCCESS: Created socket server!" << endl;
-		socket_server_fd = rc_int;
+		destination.set_address(DEFAULT_SOCKET_SERVER_ADDR);
+		destination.set_port(DEFAULT_SOCKET_SERVER_PORT);
 	}
 
 	/**
-	 * Bind the socket to IP and port
-	 *		- Family of AF_INET for IPv4 Internet protocols
-	 *		- Port given by command line argument (if none is given then
-	 *		  default of DEFAULT_SOCK_SERVER_PORT)
-	 *			- htons used for endian conversion
-	 *		- Address given by command line argument (if none is given then
-	 *		  default of DEFAULT_SOCK_SERVER_ADDR)
-	 *			- inet_pton used to load string IPv4 address to unsigned long
+	 * Create Socket Server
 	 */
-	socket_server.sin_family = AF_INET;
-	socket_server.sin_port = htons(socket_server_port);
-	inet_pton(AF_INET, socket_server_addr.c_str(), &socket_server.sin_addr);
-	rc_int = bind(socket_server_fd, (sockaddr*)(&socket_server), sizeof(socket_server));
-
-	if (rc_int == EXIT_FAILURE_N) {
-		cerr << "FAILURE: Could not bind socket server to " << socket_server_addr << ":" << socket_server_port << "..." << endl;
+	cout << "Creating TCP Socket Server in IPv4 domain..." << endl;
+	rc_int = destination.create_tcp_ipv4();
+	if (rc_int != EXIT_SUCCESS) {
+		cerr << "FAILURE: Could not create TCP Socket Server in IPv4 domain" << endl << "Aborting..." << endl;
 		return EXIT_FAILURE;
-	}
-	else {
-		cout << "SUCCESS: Binded socket server to " << socket_server_addr << ":" << socket_server_port << "!" << endl;
 	}
 
 	/**
-	 * Set the socket to listen
-	 *		- SOMAXCONN defines the maximum length to which the queue of pending
-	 *		  connections for sockfd may grow. It can be viewed on Linux machines with:
-	 *			cat /proc/sys/net/core/somaxconn
+	 * Bind the Socket Server to IP and port
 	 */
-	rc_int = listen(socket_server_fd, SOMAXCONN);
-
-	if (rc_int == EXIT_FAILURE_N) {
-		cerr << "FAILURE: Could not set socket server to listen using backlog of " << SOMAXCONN << "..." << endl;
+	cout << "Binding Socket Server to " << destination.get_address() << ":" << destination.get_port() << endl;
+	rc_int = destination.bind_tcp_ipv4();
+	if (rc_int != EXIT_SUCCESS) {
+		cerr << "FAILURE: Could not bind Socket Server to " << destination.get_address() << ":" << destination.get_port() << endl << "Aborting..." << endl;
 		return EXIT_FAILURE;
 	}
-	else {
-		cout << "SUCCESS: Set socket server to listen using backlog of " << SOMAXCONN << "!" << endl;
-	}
 
+	/**
+	 * Mark the Socket Server as passive to listen for Socket Clients
+	 */
+	cout << "Marking Socket Server as passive (to listen for Socket Clients) with backlog of " << SOMAXCONN << "..." << endl;
+	rc_int = destination.mark_passive();
+	if (rc_int != EXIT_SUCCESS) {
+		cerr << "FAILURE: Could not mark Socket Server as passive with backlog of " << SOMAXCONN << endl << "Aborting..." << endl;
+		return EXIT_FAILURE;
+	}
 	cout << "Listening..." << endl;
 
 	/**
-	 * Accept the call
+	 * Once a Socket Client attempts to connect, accept the call
 	 */
-	socket_client_size = sizeof(socket_client);
-	rc_int = accept(socket_server_fd, (sockaddr*)&socket_client, &socket_client_size);
+	rc_int = destination.accept_client(&source);
 
-	if (rc_int == EXIT_FAILURE_N) {
-		cerr << "FAILURE: Could not set socket server to accept socket client connection..." << endl;
+	if (rc_int != EXIT_SUCCESS) {
+		cerr << "FAILURE: Found a Socket Client but could not accept connection" << endl << "Aborting..." << endl;
 		return EXIT_FAILURE;
 	}
 	else {
-		cout << "SUCCESS: Socket server has accepted socket client connection!" << endl;
-		socket_client_fd = rc_int;
+		cout << "Socket Server has accepted a Socket Client connection!" << endl;
 	}
 
-	memset(host, 0, NI_MAXHOST);
-	memset(service, 0, NI_MAXSERV);
-
-	rc_int = getnameinfo((sockaddr*)&socket_client, socket_client_size, host, NI_MAXHOST, service, NI_MAXSERV, NI_NONE);
+	rc_int = source.set_name_info();
 
 	if (rc_int == EXIT_SUCCESS) {
-		cout << "SUCCESS: Host " << host << " connected on port service " << service << "!" << endl;
+		cout << "Established TCP connection to Socket Client " << source.get_host_name() << ":" << source.get_service() << endl;
 	}
 	else {
-		rc_charptr = (char*)inet_ntop(AF_INET, &socket_client.sin_addr, host, NI_MAXHOST);
+		rc_int = source.set_ipv4_info();
 
-		if (rc_charptr == NULL) {
-			cerr << "FAILURE: Host " << host << " could not connect on port service " << ntohs(socket_client.sin_port) << "..." << endl;
+		if(rc_int != EXIT_SUCCESS) {
+			cerr << "FAILURE: Could not establish TCP connection to Socket Client" << endl << "Aborting..." << endl;
 			return EXIT_FAILURE;
 		}
 		else {
-			cout << "SUCCESS: Host " << host << " connected on port service " << ntohs(socket_client.sin_port) << "!" << endl;
+			cout << "Established TCP connection to Socket Client " << source.get_host_name() << ":" << source.get_sin_port() << endl;
 		}
 	}
 
 	/**
 	 * Close the socket server file descriptor now that socket connection has been established
 	 */
-	rc_int = close(socket_server_fd);
+	cout << "Closing Socket Server file descriptor..." << endl;
+	rc_int = destination.close_file_descriptor();
 
-	if (rc_int == EXIT_FAILURE_N) {
+	if (rc_int != EXIT_SUCCESS) {
 		cerr << "FAILURE: Could not close the socket server file descriptor..." << endl;
 		return EXIT_FAILURE;
-	}
-	else {
-		cout << "SUCCESS: Closed the socket server file descriptor!" << endl;
 	}
 
 	/**
 	 * While receiving, echo message
 	 */
+	cout << "Ready to accept data from Socket Client..." << endl;
 	while (1) {
 
 		/**
 		 * Clear the buffer and then wait for socket client to send data
 		 */
-		memset(buf, 0, BUF_SIZE);
+		destination.receive_request_from_client(&source);
 
-		bytes_received = recv(socket_client_fd, buf, BUF_SIZE, 0);
-
-		if (bytes_received == EXIT_FAILURE_N) {
-			cerr << "FAILURE: Error receiving bytes from socket client. Exiting..." << endl;
+		if (destination.get_bytes_received() < EXIT_SUCCESS) {
+			cerr << "FAILURE: Error receiving bytes from Socket Client" << endl << "Aborting..." << endl;
 			return EXIT_FAILURE;
 		}
-		else if (bytes_received == 0) {
-			cout << "SUCCESS: Disconnecting socket client!" << endl;
+		else if (destination.get_bytes_received() == EXIT_SUCCESS) {
+			cout << "Disconnecting from Socket Client" << endl;
+			break;
 		}
 		else {
-			cout << string(buf, 0, bytes_received) << endl;
-			send(socket_client_fd, buf, bytes_received + 1, 0);
+			rc_int = destination.process_request();
+
+			if (rc_int != EXIT_SUCCESS) {
+				cerr << "FAILURE: Could not process request from client" << endl << "Aborting..." << endl;
+				return EXIT_FAILURE;
+			}
+
+			destination.send_response_to_client(&source);
+
+			if (destination.get_bytes_received() < EXIT_SUCCESS) {
+				cerr << "FAILURE: Error sending bytes to Socket Client" << endl << "Aborting..." << endl;
+				return EXIT_FAILURE;
+			}
 		}
 	}
 
 	/**
 	 * Close the socket client file descriptor
 	 */
-	rc_int = close(socket_client_fd);
+	cout << "Closing Socket Client file descriptor..." << endl;
+	rc_int = source.close_file_descriptor();
 
-	if (rc_int == EXIT_FAILURE_N) {
-		cerr << "FAILURE: Could not close the socket client file descriptor..." << endl;
+	if (rc_int != EXIT_SUCCESS) {
+		cerr << "FAILURE: Could not close the Socket Client file descriptor" << endl << "Aborting..." << endl;
 		return EXIT_FAILURE;
 	}
-	else {
-		cout << "SUCCESS: Closed the socket client file descriptor!" << endl;
-	}
-
 
 	return EXIT_SUCCESS;
 }
