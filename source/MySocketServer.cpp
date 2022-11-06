@@ -15,6 +15,16 @@
 
 #define TCP_PROTOCOL	(0)
 
+struct xml_string_writer : pugi::xml_writer
+{
+	std::string result;
+
+	virtual void write(const void* data, size_t size)
+	{
+		result.append(static_cast<const char*>(data), size);
+	}
+};
+
 std::string MySocketServer::get_address() {
 	return address;
 }
@@ -174,9 +184,7 @@ void MySocketServer::receive_request_from_client(MySocketClient* source) {
 		node_data = request.child("request").child("data");
 
 		std::cout << "Received XML Request: " << xml.description() << std::endl;
-		//std::cout << "Request = " << node_request.child_value() << std::endl;
-		std::cout << "\tCommand = " << node_command.child_value() << std::endl;
-		//std::cout << "Data = " << node_data.child_value() << std::endl;
+		print_xml(&request);
 	}
 }
 
@@ -196,5 +204,17 @@ int MySocketServer::process_request() {
 }
 
 void MySocketServer::send_response_to_client(MySocketClient* source) {
+	xml = response.load_buffer(buf, bytes_received);
+	std::cout << "Sending XML Response: " << xml.description() << std::endl;
+	print_xml(&response);
 	bytes_sent = send(source->file_descriptor, buf, bytes_received + 1, 0);
+}
+
+void MySocketServer::print_xml(pugi::xml_document* xml) {
+	xml_string_writer writer;
+
+	for (pugi::xml_node child = xml->first_child(); child; child = child.next_sibling()) {
+		child.print(writer, "");
+	}
+	std::cout << std::endl << writer.result << std::endl;
 }

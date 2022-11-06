@@ -119,7 +119,7 @@ int main(int argc, char* argv[]){
 	/**
 	 * While receiving, echo message
 	 */
-	std::cout << "Ready to accept data from Socket Client..." << std::endl;
+	std::cout << "Ready to accept data from Socket Client..." << std::endl << std::endl;
 	while (1) {
 
 		/**

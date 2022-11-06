@@ -20,6 +20,7 @@ public:
 	void receive_request_from_client(MySocketClient* source);
 	int process_request();
 	void send_response_to_client(MySocketClient* source);
+	void print_xml(pugi::xml_document* xml);
 
 private:
 	friend class MySocketClient;
