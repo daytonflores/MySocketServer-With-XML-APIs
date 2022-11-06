@@ -156,12 +156,27 @@ int MySocketServer::close_file_descriptor() {
 }
 
 void MySocketServer::receive_request_from_client(MySocketClient* source) {
+
+	pugi::xml_node node_request;
+	pugi::xml_node node_command;
+	pugi::xml_node node_data;
+
+
 	memset(buf, 0, BUF_SIZE);
 
 	bytes_received = recv(source->file_descriptor, buf, BUF_SIZE, 0);
 
 	if (bytes_received > 0) {
-		xml = request.load_buffer_inplace(buf, bytes_received);
+		xml = request.load_buffer(buf, bytes_received);
+
+		node_request = request.child("request");
+		node_command = request.child("request").child("command");
+		node_data = request.child("request").child("data");
+
+		std::cout << "Received XML Request: " << xml.description() << std::endl;
+		//std::cout << "Request = " << node_request.child_value() << std::endl;
+		std::cout << "\tCommand = " << node_command.child_value() << std::endl;
+		//std::cout << "Data = " << node_data.child_value() << std::endl;
 	}
 }
 
