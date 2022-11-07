@@ -8,6 +8,8 @@
 
 - Socket client data and methods are abstracted within MySocketClient class
 
+- XML parsing/handling was done using the open source C++ XML processing library [pugixml](https://github.com/zeux/pugixml)
+
 ## Important Notes
 
 - This is only compatible with Linux systems
@@ -111,3 +113,8 @@
 | :x: | Unhappy | Extra attributes to Command | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
 | :x: | Unhappy | Extra attributes to Data | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
 | :x: | Unhappy | Extra attributes to Row | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
+
+## References
+
+- [Creating a TCP Server in C++ [Linux / Code Blocks]](https://www.youtube.com/watch?v=cNdlrbZSkyQ) by SloanKelly
+- [pugixml 1.13 manual](https://pugixml.org/docs/manual.html)
