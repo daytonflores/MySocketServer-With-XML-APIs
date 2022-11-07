@@ -1,10 +1,14 @@
-# MySocketServer
+# MySocketServer With XML APIs
 
 ## Overview
 
 - This is an object-oriented socket server program. It creates a socket server object that can establish a connection with a socket client. Once connection is established, the client will send XML data on that connection at which point the server will display the XML request, process the request, display the XML response, and then send the XML response back to the client.
 
-## Important Notes
+- Socket server data and methods are abstracted within MySocketServer class
+
+- Socket client data and methods are abstracted within MySocketClient class
+
+## Important :x:tes
 
 - Default IP address and port of the socket server are 127.0.0.1 and 5000, respectively. But these are configurable:
 	- To configure IP address alone, send this as a command-line parameter:
@@ -17,7 +21,7 @@
 	./main 127.0.0.222 6060
 	```
 	
-	- NOTE: Configuring port alone is NOT supported
+	- :x:TE: Configuring port alone is :x:T supported
 	
 - Only 1 client can establish a connection with the server at a time
 
@@ -49,7 +53,7 @@
 ```
 
 ``` xml
-<!-- Response (server will not send this back as a single line) -->
+<!-- Response (server will :x:t send this back as a single line) -->
 <Response>
 <Command>GetPlayerInfo</Command>
 <Status>Success</Status>
@@ -69,24 +73,24 @@
 
 | Passed | Path | Scenario | Expected | Results |
 | ------ | ---- | -------- | -------- | ------- |
-| Yes | Happy | Valid card number, valid PIN | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
-| Yes | Unhappy | Valid card number, invalid PIN | Command returned as GetPlayerInfo, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid PIN) | Command returned as GetPlayerInfo, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid PIN) |
-| Yes | Unhappy | Invalid card number | Command returned as GetPlayerInfo, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Card Number) | Command returned as GetPlayerInfo, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Card Number) |
-| Yes | Unhappy | Missing Request Tags | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Missing Command Tags | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Missing Data Tags | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Missing Row Tags | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Missing Row Attributes | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Incorrect Row Attributes | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra siblings to Request | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra siblings to Command | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra siblings to Data | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra siblings to Row | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra children to Request | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra children to Command | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra children to Data | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| Yes | Unhappy | Extra children to Row | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) |
-| No | Unhappy | Extra attributes to Request | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
-| No | Unhappy | Extra attributes to Command | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
-| No | Unhappy | Extra attributes to Data | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
-| No | Unhappy | Extra attributes to Row | Command returned as empty, Status returned as Failed, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
+| :white_check_mark: | Happy | Valid card number, valid PIN | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
+| :white_check_mark: | Unhappy | Valid card number, invalid PIN | Command returned as GetPlayerInfo, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid PIN) | Command returned as GetPlayerInfo, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid PIN) |
+| :white_check_mark: | Unhappy | Invalid card number | Command returned as GetPlayerInfo, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Card Number) | Command returned as GetPlayerInfo, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Card Number) |
+| :white_check_mark: | Unhappy | Missing Request Tags | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Missing Command Tags | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Missing Data Tags | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Missing Row Tags | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Missing Row Attributes | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Incorrect Row Attributes | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra siblings to Request | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra siblings to Command | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra siblings to Data | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra siblings to Row | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra children to Request | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra children to Command | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra children to Data | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :white_check_mark: | Unhappy | Extra children to Row | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) |
+| :x: | Unhappy | Extra attributes to Request | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
+| :x: | Unhappy | Extra attributes to Command | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
+| :x: | Unhappy | Extra attributes to Data | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
+| :x: | Unhappy | Extra attributes to Row | Command returned as empty, Status returned as Fail, ErrorMessage returned under Data as Row (Invalid Request Format) | Command returned as GetPlayerInfo, Status returned as Success, demographics returned under Data as Rows (CardNumber, FirstName, LastName, Address, City, State, ZipCode) |
