@@ -10,6 +10,12 @@
 
 - XML parsing/handling was done using the open source C++ XML processing library [pugixml](https://github.com/zeux/pugixml)
 
+## Design Approach
+
+- The approach I took to design this system was to abstract the socket handling + XML methods within 2 objects: MySocketServer and MySocketClient. The reason for this approach was to add a layer of abstraction between handling socket information between server and client as it would improve reusability and enhance ease of integration into a more complex environment. This also sets the program up to potentially handle connections to multiple MySocketClients in the future
+	- MySocketClient only serves as a layer of abstraction for storing all information and methods about the socket client into its own object
+	- MySocketServer serves as a layer of abstraction for managing the socket server and the client it communicates with. Requests "from" the client and responses "to" the client are both stored in here. This is done in order to keep MySocketClient object as just a holder of information that is necessary for the server (since the client is external and the server is the main piece of this program)
+
 ## Important Notes
 
 - This is only compatible with Linux systems
