@@ -8,12 +8,21 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "../include/date.h"
 #include "../include/pugiconfig.hpp"
 #include "../include/pugixml.hpp"
 #include "../include/MySocketClient.h"
 #include "../include/MySocketServer.h"
 
-#define TCP_PROTOCOL	(0)
+#define TCP_PROTOCOL			(0)
+#define TEST_CARD_NUMBER		("123456789")
+#define TEST_CARD_PIN			("1234")
+#define TEST_CARD_FIRST_NAME	("Dayton")
+#define TEST_CARD_LAST_NAME		("Flores")
+#define TEST_CARD_ADDRESS		("123 Las Vegas Blvd")
+#define TEST_CARD_CITY			("Las Vegas")
+#define TEST_CARD_STATE			("NV")
+#define TEST_CARD_ZIP_CODE		("55555")
 
 struct xml_string_writer : pugi::xml_writer
 {
@@ -292,8 +301,8 @@ void MySocketServer::command_getplayerinfo() {
 	std::string card_number = request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "CardNumber").child_value();
 	std::string pin = request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "PIN").child_value();
 
-	if (card_number == "123456789") {
-		if (pin == "1234") {
+	if (card_number == TEST_CARD_NUMBER) {
+		if (pin == TEST_CARD_PIN) {
 			response.child("Response").child("Status").append_child(pugi::node_pcdata).set_value("Success");
 			response.child("Response").append_child("Data");
 			row = response.child("Response").child("Data").append_child("Row");
@@ -310,13 +319,13 @@ void MySocketServer::command_getplayerinfo() {
 			row.append_attribute("Type") = "State";
 			row = response.child("Response").child("Data").append_child("Row");
 			row.append_attribute("Type") = "ZipCode";
-			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "CardNumber").append_child(pugi::node_pcdata).set_value("123456789");
-			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "FirstName").append_child(pugi::node_pcdata).set_value("Dayton");
-			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "LastName").append_child(pugi::node_pcdata).set_value("Flores");
-			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "Address").append_child(pugi::node_pcdata).set_value("123 Las Vegas Blvd");
-			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "City").append_child(pugi::node_pcdata).set_value("Las Vegas");
-			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "State").append_child(pugi::node_pcdata).set_value("NV");
-			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "ZipCode").append_child(pugi::node_pcdata).set_value("55555");
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "CardNumber").append_child(pugi::node_pcdata).set_value(TEST_CARD_NUMBER);
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "FirstName").append_child(pugi::node_pcdata).set_value(TEST_CARD_FIRST_NAME);
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "LastName").append_child(pugi::node_pcdata).set_value(TEST_CARD_LAST_NAME);
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "Address").append_child(pugi::node_pcdata).set_value(TEST_CARD_ADDRESS);
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "City").append_child(pugi::node_pcdata).set_value(TEST_CARD_CITY);
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "State").append_child(pugi::node_pcdata).set_value(TEST_CARD_STATE);
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "ZipCode").append_child(pugi::node_pcdata).set_value(TEST_CARD_ZIP_CODE);
 		}
 		else {
 			response.child("Response").child("Status").append_child(pugi::node_pcdata).set_value("Fail");
