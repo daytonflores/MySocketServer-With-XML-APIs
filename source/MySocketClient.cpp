@@ -9,20 +9,16 @@
 
 #include "../include/MySocketClient.h"
 
+/**
+ * \def		NI_NONE
+ * \brief	The value to send to getnameinfo for zero flags
+ */
 #define NI_NONE	(0)
 
 MySocketClient::MySocketClient() {
 	socket_address_length = sizeof(socket_address);
 	memset(host_name, 0, NI_MAXHOST);
 	memset(service, 0, NI_MAXSERV);
-}
-
-int MySocketClient::get_file_descriptor() {
-	return file_descriptor;
-}
-
-socklen_t MySocketClient::get_socket_address_length() {
-	return socket_address_length;
 }
 
 char* MySocketClient::get_host_name() {

@@ -12,14 +12,54 @@
 #include "../include/MySocketClient.h"
 #include "../include/MySocketServer.h"
 
+/**
+ * \def		DEFAULT_SOCKET_SERVER_ADDR
+ * \brief	To be used as the IP address of the socket server if no command-line
+ *			argument is given
+ */
 #define DEFAULT_SOCKET_SERVER_ADDR	("127.0.0.1")
+
+/**
+ * \def		DEFAULT_SOCKET_SERVER_PORT
+ * \brief	To be used as the port of the socket server if no command-line
+ *			argument is given
+ */
 #define DEFAULT_SOCKET_SERVER_PORT	(5000)
+
+/**
+ * \def		MAX_NUM_OF_ARGS
+ * \brief	The max number of command-line arguments to expect
+ */
 #define MAX_NUM_OF_ARGS				(2 + 1)
 
+/**
+ * \fn		void main
+ * \param	argc	The amount of command-line arguments given during execution
+ * \param	argv	Each element of this array points to the string of each
+ *					command-line argument
+ * \return	Returns EXIT_FAILURE upon any failures encountered,
+ *			and EXIT_SUCCESS otherwise
+ * \brief   Creates a socket server, connects with client, and processes XML
+ *			requests from client and sends XML responses to client
+ */
 int main(int argc, char* argv[]){
 
-	int rc_int;
+	/**
+	 * \var		return_code
+	 * \brief	Holds return value of any invocations returned status codes
+	 */
+	int return_code;
+
+	/**
+	 * \var		destination
+	 * \brief	Server object to process commands from client
+	 */
 	MySocketServer destination;
+
+	/**
+	 * \var		source
+	 * \brief	Client object sending commands to server via socket
+	 */
 	MySocketClient source;
 
 	/**
@@ -45,118 +85,125 @@ int main(int argc, char* argv[]){
 	}
 
 	/**
-	 * Create Socket Server
+	 * Create server object
 	 */
 	std::cout << "Creating TCP Socket Server in IPv4 domain..." << std::endl;
-	rc_int = destination.create_tcp_ipv4();
-	if (rc_int != EXIT_SUCCESS) {
+	return_code = destination.create_tcp_ipv4();
+	if (return_code != EXIT_SUCCESS) {
 		std::cerr << "FAILURE: Could not create TCP Socket Server in IPv4 domain" << std::endl << "Aborting..." << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	/**
-	 * Bind the Socket Server to IP and port
+	 * Bind the server object to IP and port
 	 */
-	std::cout << "Binding Socket Server to " << destination.get_address() << ":" << destination.get_port() << std::endl;
-	rc_int = destination.bind_tcp_ipv4();
-	if (rc_int != EXIT_SUCCESS) {
-		std::cerr << "FAILURE: Could not bind Socket Server to " << destination.get_address() << ":" << destination.get_port() << std::endl << "Aborting..." << std::endl;
+	std::cout << "Binding server to " << destination.get_address() << ":" << destination.get_port() << std::endl;
+	return_code = destination.bind_tcp_ipv4();
+	if (return_code != EXIT_SUCCESS) {
+		std::cerr << "FAILURE: Could not bind server to " << destination.get_address() << ":" << destination.get_port() << std::endl << "Aborting..." << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	/**
-	 * Mark the Socket Server as passive to listen for Socket Clients
+	 * Mark the server as passive to listen for clients attempting to
+	 * initiate a connection
 	 */
-	std::cout << "Marking Socket Server as passive (to listen for Socket Clients) with backlog of " << SOMAXCONN << "..." << std::endl;
-	rc_int = destination.mark_passive();
-	if (rc_int != EXIT_SUCCESS) {
-		std::cerr << "FAILURE: Could not mark Socket Server as passive with backlog of " << SOMAXCONN << std::endl << "Aborting..." << std::endl;
+	std::cout << "Marking server as passive (to listen for clients) with backlog of " << SOMAXCONN << "..." << std::endl;
+	return_code = destination.mark_passive();
+	if (return_code != EXIT_SUCCESS) {
+		std::cerr << "FAILURE: Could not mark server as passive with backlog of " << SOMAXCONN << std::endl << "Aborting..." << std::endl;
 		return EXIT_FAILURE;
 	}
-	std::cout << "Listening..." << std::endl;
 
 	/**
-	 * Once a Socket Client attempts to connect, accept the call
+	 * Once a client attempts to connect, accept the call
 	 */
-	rc_int = destination.accept_client(&source);
-
-	if (rc_int != EXIT_SUCCESS) {
-		std::cerr << "FAILURE: Found a Socket Client but could not accept connection" << std::endl << "Aborting..." << std::endl;
+	std::cout << "Listening for clients..." << std::endl;
+	return_code = destination.accept_client(&source);
+	if (return_code != EXIT_SUCCESS) {
+		std::cerr << "FAILURE: Found a client but could not accept connection" << std::endl << "Aborting..." << std::endl;
 		return EXIT_FAILURE;
 	}
 	else {
-		std::cout << "Socket Server has accepted a Socket Client connection!" << std::endl;
+		std::cout << "Server has accepted a client connection!" << std::endl;
 	}
 
-	rc_int = source.set_name_info();
-
-	if (rc_int == EXIT_SUCCESS) {
-		std::cout << "Established TCP connection to Socket Client " << source.get_host_name() << ":" << source.get_service() << std::endl;
+	/**
+	 * Grab the hostname (or IP address) + port number the client is
+	 * connecting from
+	 */
+	return_code = source.set_name_info();
+	if (return_code == EXIT_SUCCESS) {
+		std::cout << "Established TCP socket connection to client " << source.get_host_name() << ":" << source.get_service() << std::endl;
 	}
 	else {
-		rc_int = source.set_ipv4_info();
+		return_code = source.set_ipv4_info();
 
-		if(rc_int != EXIT_SUCCESS) {
-			std::cerr << "FAILURE: Could not establish TCP connection to Socket Client" << std::endl << "Aborting..." << std::endl;
+		if(return_code != EXIT_SUCCESS) {
+			std::cerr << "FAILURE: Could not establish TCP socket connection to client" << std::endl << "Aborting..." << std::endl;
 			return EXIT_FAILURE;
 		}
 		else {
-			std::cout << "Established TCP connection to Socket Client " << source.get_host_name() << ":" << source.get_sin_port() << std::endl;
+			std::cout << "Established TCP socket connection to client " << source.get_host_name() << ":" << source.get_sin_port() << std::endl;
 		}
 	}
 
 	/**
-	 * Close the socket server file descriptor now that socket connection has been established
+	 * Close the server file descriptor now that socket connection has been established
 	 */
-	std::cout << "Closing Socket Server file descriptor..." << std::endl;
-	rc_int = destination.close_file_descriptor();
-
-	if (rc_int != EXIT_SUCCESS) {
-		std::cerr << "FAILURE: Could not close the socket server file descriptor..." << std::endl;
+	std::cout << "Closing server file descriptor..." << std::endl;
+	return_code = destination.close_file_descriptor();
+	if (return_code != EXIT_SUCCESS) {
+		std::cerr << "FAILURE: Could not close the server file descriptor..." << std::endl << "Aborting..." << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	/**
-	 * While receiving, echo message
+	 * Server will continue to process requests from client until
+	 * client hangs up
 	 */
-	std::cout << "Ready to accept data from Socket Client..." << std::endl << std::endl;
 	while (1) {
 
 		/**
-		 * Clear the buffer and then wait for socket client to send data
+		 * Clear the buffer and then wait for client to send data. If client has
+		 * hung up then close the client file descriptor and break from loop.
+		 * Otherwise, server will validate and process the request and then
+		 * send the response to the client. Once response is sent, server
+		 * will again clear the buffer and wait for client to send data
 		 */
+		std::cout << "Waiting on client to send request..." << std::endl << std::endl;
 		destination.receive_request_from_client(&source);
-
 		if (destination.get_bytes_received() < EXIT_SUCCESS) {
-			std::cerr << "FAILURE: Error receiving bytes from Socket Client" << std::endl << "Aborting..." << std::endl;
+			std::cerr << "FAILURE: Error receiving request from client" << std::endl << "Aborting..." << std::endl;
 			return EXIT_FAILURE;
 		}
 		else if (destination.get_bytes_received() == EXIT_SUCCESS) {
-			std::cout << "Closing Socket Client file descriptor..." << std::endl;
-			rc_int = source.close_file_descriptor();
-
-			if (rc_int != EXIT_SUCCESS) {
-				std::cerr << "FAILURE: Could not close the Socket Client file descriptor" << std::endl << "Aborting..." << std::endl;
+			std::cout << "Connection to client lost! Closing client file descriptor..." << std::endl;
+			return_code = source.close_file_descriptor();
+			if (return_code != EXIT_SUCCESS) {
+				std::cerr << "FAILURE: Could not close the client file descriptor" << std::endl << "Aborting..." << std::endl;
 				return EXIT_FAILURE;
 			}
 
-			std::cout << "Disconnecting from Socket Client" << std::endl;
 			break;
 		}
 		else {
+			std::cout << "Validating request from client..." << std::endl;
 			destination.validate_request();
 
-			std::cout << "Processing request from Socket Client" << std::endl;
+			std::cout << "Processing request from client..." << std::endl;
 			destination.process_request();
 
+			std::cout << "Sending response to client..." << std::endl;
 			destination.send_response_to_client(&source);
-
 			if (destination.get_bytes_sent() < EXIT_SUCCESS) {
-				std::cerr << "FAILURE: Error sending bytes to Socket Client" << std::endl << "Aborting..." << std::endl;
+				std::cerr << "FAILURE: Error sending response to client" << std::endl << "Aborting..." << std::endl;
 				return EXIT_FAILURE;
 			}
 		}
 	}
+
+	std::cout << "Clean-up complete! Exiting gracefully..." << std::endl;
 
 	return EXIT_SUCCESS;
 }
