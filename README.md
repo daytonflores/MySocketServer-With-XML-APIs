@@ -10,6 +10,8 @@
 
 ## Important Notes
 
+- This is only compatible with Linux systems
+
 - Default IP address and port of the socket server are 127.0.0.1 and 5000, respectively. But these are configurable:
 	- To configure IP address alone, send this as a command-line parameter:
 	``` bash
@@ -29,6 +31,20 @@
 
 - XML requests must be sent to the server as a single line (i.e. no newlines)
 
+## User Guide
+
+1. Download all files and keep relative file structure the same
+	- Make sure ```include``` + ```source``` are sibling directories
+2. Navigate to ```source``` directory and run ```make```
+3. Once executable has been created, run ```./main```
+	- You may also configure the IP address alone or the IP address + port with command-line parameters (see Important Notes above)
+4. Launch a client and initiate a socket connection to the server
+	- For my testing, I use ```netcat``` (installed on my Debian system with ```sudo apt-get install netcat```)
+	- Once server is listening, initiate socket connection to the server ```netcat 127.0.0.1 5000```
+5. Create a valid XML request (as a single line) using the Samples as reference (see Supported Commands below)
+	- Make sure the data being used in the request matches the test player attributes defined as macros at the top of ```../source/MySocketServer.cpp```
+6. Observe and validate the XML response (see Test Cases below)
+	
 ## Supported Commands
 
 ### GetPlayerInfo
