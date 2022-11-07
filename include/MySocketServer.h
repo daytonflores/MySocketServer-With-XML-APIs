@@ -18,12 +18,17 @@ public:
 	int accept_client(MySocketClient *source);
 	int close_file_descriptor();
 	void receive_request_from_client(MySocketClient* source);
-	int process_request();
+	void validate_request();
+	void process_request();
 	void send_response_to_client(MySocketClient* source);
-	void print_xml(pugi::xml_document* xml);
+	std::string get_printable_xml(pugi::xml_document* xml);
+	void command_getplayerinfo();
+	void command_unknown();
+	void request_not_valid();
 
 private:
 	friend class MySocketClient;
+	friend class pugi::xml_document;
 
 	static const int BUF_SIZE = 1024;
 
@@ -35,6 +40,7 @@ private:
 	pugi::xml_parse_result xml;
 	pugi::xml_document request;
 	pugi::xml_document response;
+	bool request_validated;
 	int bytes_received;
 	int bytes_sent;
 };

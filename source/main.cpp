@@ -132,35 +132,30 @@ int main(int argc, char* argv[]){
 			return EXIT_FAILURE;
 		}
 		else if (destination.get_bytes_received() == EXIT_SUCCESS) {
+			std::cout << "Closing Socket Client file descriptor..." << std::endl;
+			rc_int = source.close_file_descriptor();
+
+			if (rc_int != EXIT_SUCCESS) {
+				std::cerr << "FAILURE: Could not close the Socket Client file descriptor" << std::endl << "Aborting..." << std::endl;
+				return EXIT_FAILURE;
+			}
+
 			std::cout << "Disconnecting from Socket Client" << std::endl;
 			break;
 		}
 		else {
-			rc_int = destination.process_request();
+			destination.validate_request();
 
-			if (rc_int != EXIT_SUCCESS) {
-				std::cerr << "FAILURE: Could not process request from client" << std::endl << "Aborting..." << std::endl;
-				return EXIT_FAILURE;
-			}
+			std::cout << "Processing request from Socket Client" << std::endl;
+			destination.process_request();
 
 			destination.send_response_to_client(&source);
 
-			if (destination.get_bytes_received() < EXIT_SUCCESS) {
+			if (destination.get_bytes_sent() < EXIT_SUCCESS) {
 				std::cerr << "FAILURE: Error sending bytes to Socket Client" << std::endl << "Aborting..." << std::endl;
 				return EXIT_FAILURE;
 			}
 		}
-	}
-
-	/**
-	 * Close the socket client file descriptor
-	 */
-	std::cout << "Closing Socket Client file descriptor..." << std::endl;
-	rc_int = source.close_file_descriptor();
-
-	if (rc_int != EXIT_SUCCESS) {
-		std::cerr << "FAILURE: Could not close the Socket Client file descriptor" << std::endl << "Aborting..." << std::endl;
-		return EXIT_FAILURE;
 	}
 
 	return EXIT_SUCCESS;

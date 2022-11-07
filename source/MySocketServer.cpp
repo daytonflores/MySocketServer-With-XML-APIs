@@ -134,7 +134,7 @@ int MySocketServer::mark_passive() {
 	return return_value;
 }
 
-int MySocketServer::accept_client(MySocketClient *source){
+int MySocketServer::accept_client(MySocketClient* source) {
 	int return_value;
 
 	return_value = accept(file_descriptor, (sockaddr*)(&source->socket_address), &source->socket_address_length);
@@ -166,55 +166,204 @@ int MySocketServer::close_file_descriptor() {
 }
 
 void MySocketServer::receive_request_from_client(MySocketClient* source) {
-
-	pugi::xml_node node_request;
-	pugi::xml_node node_command;
-	pugi::xml_node node_data;
-
-
 	memset(buf, 0, BUF_SIZE);
 
 	bytes_received = recv(source->file_descriptor, buf, BUF_SIZE, 0);
 
 	if (bytes_received > 0) {
 		xml = request.load_buffer(buf, bytes_received);
-
-		node_request = request.child("request");
-		node_command = request.child("request").child("command");
-		node_data = request.child("request").child("data");
-
 		std::cout << "Received XML Request: " << xml.description() << std::endl;
-		print_xml(&request);
+		std::cout << std::endl << get_printable_xml(&request) << std::endl << std::endl;
 	}
 }
 
-int MySocketServer::process_request() {
-	int return_value;
+void MySocketServer::validate_request() {
+	int children;
+	request_validated = true;
 
-	return_value = EXIT_SUCCESS;
+	if (request.child("Request") == NULL
+		|| request.child("Request").child("Command") == NULL
+		|| request.child("Request").child("Data") == NULL) {
+		request_validated = false;
+		return;
+	}
 
-	if (return_value != EXIT_SUCCESS) {
-		return_value = EXIT_FAILURE;
+	if (request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "CardNumber") == NULL
+		|| request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "PIN") == NULL) {
+		request_validated = false;
+		return;
+	}
+	
+	for (pugi::xml_node node = request.first_child(); node; node = node.next_sibling()) {
+		if ((std::string)node.name() != "Request") {
+			request_validated = false;
+			return;
+		}
+	}
+	
+	for (pugi::xml_node node = request.child("Request").first_child(); node; node = node.next_sibling()) {
+		if ((std::string)node.name() != "Command"
+			&& (std::string)node.name() != "Data") {
+			request_validated = false;
+			return;
+		}
+	}
+	
+	children = 0;
+	for (pugi::xml_node node = request.child("Request").child("Command").first_child(); node; node = node.next_sibling(), children++) {
+		if (children > 0 || node.type() != pugi::node_pcdata) {
+			request_validated = false;
+			return;
+		}
+	}
+
+	children = 0;
+	for (pugi::xml_node node = request.child("Request").child("Data").first_child(); node; node = node.next_sibling(), children++) {
+		if (children > 1 || node.type() == pugi::node_pcdata) {
+			request_validated = false;
+			return;
+		}
+	}
+
+	children = 0;
+	for (pugi::xml_node node = request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "CardNumber").first_child(); node; node = node.next_sibling(), children++) {
+		if (children > 0 || node.type() != pugi::node_pcdata) {
+			request_validated = false;
+			return;
+		}
+	}
+
+	children = 0;
+	for (pugi::xml_node node = request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "PIN").first_child(); node; node = node.next_sibling(), children++) {
+		if (children > 0 || node.type() != pugi::node_pcdata) {
+			request_validated = false;
+			return;
+		}
+	}
+
+}
+
+void MySocketServer::process_request() {
+	//const pugi::char_t* date = (const pugi::char_t[30])date::format("%F %T", std::chrono::system_clock::now());
+
+	response.reset();
+	if (request_validated) {
+		if ((std::string)request.child("Request").child("Command").child_value() == "GetPlayerInfo") {
+			command_getplayerinfo();
+		}
+		else {
+			command_unknown();
+		}
 	}
 	else {
-		return_value = EXIT_SUCCESS;
+		request_not_valid();
 	}
-
-	return return_value;
 }
 
 void MySocketServer::send_response_to_client(MySocketClient* source) {
-	xml = response.load_buffer(buf, bytes_received);
-	std::cout << "Sending XML Response: " << xml.description() << std::endl;
-	print_xml(&response);
-	bytes_sent = send(source->file_descriptor, buf, bytes_received + 1, 0);
+	bytes_sent = send(source->file_descriptor, get_printable_xml(&response).c_str(), get_printable_xml(&response).length() + 1, 0);
+
+	if (bytes_sent > 0) {
+		std::cout << std::endl << "Sent XML Response: No error" << std::endl;
+		std::cout << std::endl << get_printable_xml(&response) << std::endl << std::endl;
+	}
 }
 
-void MySocketServer::print_xml(pugi::xml_document* xml) {
+std::string MySocketServer::get_printable_xml(pugi::xml_document* xml) {
 	xml_string_writer writer;
 
 	for (pugi::xml_node child = xml->first_child(); child; child = child.next_sibling()) {
 		child.print(writer, "");
 	}
-	std::cout << std::endl << writer.result << std::endl;
+	
+	return writer.result;
+}
+
+void MySocketServer::command_getplayerinfo() {
+	pugi::xml_node data = request.child("Request").child("Data");
+	pugi::xml_node row;
+
+	response.reset();
+	response.append_child("Response");
+	response.child("Response").append_child("Command");
+	response.child("Response").child("Command").append_child(pugi::node_pcdata).set_value("GetPlayerInfo");
+	response.child("Response").append_child("Status");
+
+	std::string card_number = request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "CardNumber").child_value();
+	std::string pin = request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "PIN").child_value();
+
+	if (card_number == "123456789") {
+		if (pin == "1234") {
+			response.child("Response").child("Status").append_child(pugi::node_pcdata).set_value("Success");
+			response.child("Response").append_child("Data");
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "CardNumber";
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "FirstName";
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "LastName";
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "Address";
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "City";
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "State";
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "ZipCode";
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "CardNumber").append_child(pugi::node_pcdata).set_value("123456789");
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "FirstName").append_child(pugi::node_pcdata).set_value("Dayton");
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "LastName").append_child(pugi::node_pcdata).set_value("Flores");
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "Address").append_child(pugi::node_pcdata).set_value("123 Las Vegas Blvd");
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "City").append_child(pugi::node_pcdata).set_value("Las Vegas");
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "State").append_child(pugi::node_pcdata).set_value("NV");
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "ZipCode").append_child(pugi::node_pcdata).set_value("55555");
+		}
+		else {
+			response.child("Response").child("Status").append_child(pugi::node_pcdata).set_value("Fail");
+			response.child("Response").append_child("Data");
+			row = response.child("Response").child("Data").append_child("Row");
+			row.append_attribute("Type") = "ErrorMessage";
+			response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "ErrorMessage").append_child(pugi::node_pcdata).set_value("Invalid PIN");
+		}
+	}
+	else {
+		response.child("Response").child("Status").append_child(pugi::node_pcdata).set_value("Fail");
+		response.child("Response").append_child("Data");
+		row = response.child("Response").child("Data").append_child("Row");
+		row.append_attribute("Type") = "ErrorMessage";
+		response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "ErrorMessage").append_child(pugi::node_pcdata).set_value("Invalid Card Number");
+
+	}
+}
+
+void MySocketServer::command_unknown() {
+	pugi::xml_node row;
+
+	response.reset();
+	response.append_child("Response");
+	response.child("Response").append_child("Command");
+	response.child("Response").child("Response").append_child(pugi::node_pcdata).set_value("Unknown");
+	response.child("Response").append_child("Status");
+	response.child("Response").child("Status").append_child(pugi::node_pcdata).set_value("Fail");
+	response.child("Response").append_child("Data");
+	row = response.child("Response").child("Data").append_child("Row");
+	row.append_attribute("Type") = "ErrorMessage";
+	response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "ErrorMessage").append_child(pugi::node_pcdata).set_value("Invalid Command");
+
+}
+
+void MySocketServer::request_not_valid() {
+	pugi::xml_node row;
+
+	response.reset();
+	response.append_child("Response");
+	response.child("Response").append_child("Command");
+	response.child("Response").child("Response").append_child(pugi::node_pcdata).set_value("Unknown");
+	response.child("Response").append_child("Status");
+	response.child("Response").child("Status").append_child(pugi::node_pcdata).set_value("Fail");
+	response.child("Response").append_child("Data");
+	row = response.child("Response").child("Data").append_child("Row");
+	row.append_attribute("Type") = "ErrorMessage";
+	response.child("Response").child("Data").find_child_by_attribute("Row", "Type", "ErrorMessage").append_child(pugi::node_pcdata).set_value("Invalid Request Format");
+
 }
