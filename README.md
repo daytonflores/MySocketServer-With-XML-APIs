@@ -8,7 +8,7 @@
 
 - Socket client data and methods are abstracted within MySocketClient class
 
-## Important :x:tes
+## Important Notes
 
 - Default IP address and port of the socket server are 127.0.0.1 and 5000, respectively. But these are configurable:
 	- To configure IP address alone, send this as a command-line parameter:
@@ -21,7 +21,7 @@
 	./main 127.0.0.222 6060
 	```
 	
-	- :x:TE: Configuring port alone is :x:T supported
+	- NOTE: Configuring port alone is NOT supported
 	
 - Only 1 client can establish a connection with the server at a time
 
