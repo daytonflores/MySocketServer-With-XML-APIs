@@ -44,6 +44,7 @@
 5. Create a valid XML request (as a single line) using the Samples as reference (see Supported Commands below)
 	- Make sure the data being used in the request matches the test player attributes defined as macros at the top of ```../source/MySocketServer.cpp```
 6. Observe and validate the XML response (see Test Cases below)
+7. To end the program, close the client by pressing ```CTRL``` + ```C``` in ```netcat```
 	
 ## Supported Commands
 
