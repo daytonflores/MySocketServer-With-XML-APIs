@@ -181,7 +181,7 @@ void MySocketServer::receive_request_from_client(MySocketClient* source) {
 
 	if (bytes_received > 0) {
 		xml = request.load_buffer(buf, bytes_received);
-		std::cout << "Received XML Request: " << xml.description() << std::endl;
+		std::cout << "Received XML Request: " << std::endl;
 		std::cout << std::endl << get_printable_xml(&request) << std::endl << std::endl;
 	}
 }
@@ -253,8 +253,6 @@ void MySocketServer::validate_request() {
 }
 
 void MySocketServer::process_request() {
-	//const pugi::char_t* date = (const pugi::char_t[30])date::format("%F %T", std::chrono::system_clock::now());
-
 	response.reset();
 	if (request_validated) {
 		if ((std::string)request.child("Request").child("Command").child_value() == "GetPlayerInfo") {
@@ -273,7 +271,7 @@ void MySocketServer::send_response_to_client(MySocketClient* source) {
 	bytes_sent = send(source->file_descriptor, get_printable_xml(&response).c_str(), get_printable_xml(&response).length() + 1, 0);
 
 	if (bytes_sent > 0) {
-		std::cout << std::endl << "Sent XML Response: No error" << std::endl;
+		std::cout << std::endl << "Sent XML Response:" << std::endl;
 		std::cout << std::endl << get_printable_xml(&response) << std::endl << std::endl;
 	}
 }
