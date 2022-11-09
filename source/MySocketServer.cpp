@@ -197,6 +197,7 @@ void MySocketServer::receive_request_from_client(MySocketClient* source) {
 }
 
 void MySocketServer::validate_request() {
+	int attributes;
 	int children;
 	request_validated = true;
 
@@ -211,6 +212,16 @@ void MySocketServer::validate_request() {
 	}
 
 	/**
+	 *	Validate that Request, Command, and Date nodes have no attributes
+	 */
+	if (request.child("Request").first_attribute() != NULL
+		|| request.child("Request").child("Command").first_attribute() != NULL
+		|| request.child("Request").child("Data").first_attribute() != NULL) {
+		request_validated = false;
+		return;
+	}
+
+	/**
 	 *	Validate that a Row node exists with attribute Type, value CardNumber
 	 *	Validate that a Row node exists with attribute Type, value PIN
 	 */
@@ -218,6 +229,19 @@ void MySocketServer::validate_request() {
 		|| request.child("Request").child("Data").find_child_by_attribute("Row", "Type", "PIN") == NULL) {
 		request_validated = false;
 		return;
+	}
+
+	/**
+	 *	Validate that each Row node has exactly 1 attribute named Type
+	 */
+	for (pugi::xml_node node = request.child("Request").child("Data").first_child(); node; node = node.next_sibling()) {
+		attributes = 0;
+		for (pugi::xml_attribute attribute = node.first_attribute(); attribute; attribute = attribute.next_attribute(), attributes++) {
+			if (attributes > 0 || (std::string)attribute.name() != "Type") {
+				request_validated = false;
+				return;
+			}
+		}
 	}
 	
 	/**
@@ -229,7 +253,7 @@ void MySocketServer::validate_request() {
 			return;
 		}
 	}
-	
+
 	/**
 	 *	Validate Command + Data are the only nodes at their level
 	 */
