@@ -1,4 +1,4 @@
-# C Compiler
+# C++ Compiler
 CC= g++
 
 # Check if Unix or Windows, define CLEAN based on OS
