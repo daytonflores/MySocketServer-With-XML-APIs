@@ -15,14 +15,14 @@
 /**
  * \def		DEFAULT_SOCKET_SERVER_ADDR
  * \brief	To be used as the IP address of the socket server if no command-line
- *			argument is given
+ *		argument is given
  */
 #define DEFAULT_SOCKET_SERVER_ADDR	("127.0.0.1")
 
 /**
  * \def		DEFAULT_SOCKET_SERVER_PORT
  * \brief	To be used as the port of the socket server if no command-line
- *			argument is given
+ *		argument is given
  */
 #define DEFAULT_SOCKET_SERVER_PORT	(5000)
 
@@ -30,17 +30,17 @@
  * \def		MAX_NUM_OF_ARGS
  * \brief	The max number of command-line arguments to expect
  */
-#define MAX_NUM_OF_ARGS				(2 + 1)
+#define MAX_NUM_OF_ARGS			(2 + 1)
 
 /**
  * \fn		void main
  * \param	argc	The amount of command-line arguments given during execution
  * \param	argv	Each element of this array points to the string of each
- *					command-line argument
+ *			command-line argument
  * \return	Returns EXIT_FAILURE upon any failures encountered,
- *			and EXIT_SUCCESS otherwise
- * \brief   Creates a socket server, connects with client, and processes XML
- *			requests from client and sends XML responses to client
+ *		and EXIT_SUCCESS otherwise
+ * \brief	Creates a socket server, connects with client, and processes XML
+ *		requests from client and sends XML responses to client
  */
 int main(int argc, char* argv[]){
 
@@ -64,8 +64,8 @@ int main(int argc, char* argv[]){
 
 	/**
 	 * Set Socket Server port and address based on command line arguments
-	 *		- Port must be integer so it can be passed to htons
-	 *		- Address must be string so it can be passed to inet_pton
+	 *	- Port must be integer so it can be passed to htons
+	 *	- Address must be string so it can be passed to inet_pton
 	 */
 	if (argc > MAX_NUM_OF_ARGS) {
 		std::cerr << "FAILURE: Invalid number of arguments..." << std::endl;

@@ -15,7 +15,7 @@ public:
 	 * \fn		Constructor
 	 * \param	N/A
 	 * \return	N/A
-	 * \brief   No parameters passed
+	 * \brief	No parameters passed
 	 */
 	SocketClient();
 
@@ -23,7 +23,7 @@ public:
 	 * \fn		char* get_host_name
 	 * \param	N/A
 	 * \return	Returns the client host name
-	 * \brief   Getter for client host name
+	 * \brief	Getter for client host name
 	 */
 	char* get_host_name();
 
@@ -31,7 +31,7 @@ public:
 	 * \fn		char* get_service
 	 * \param	N/A
 	 * \return	Returns the client port
-	 * \brief   Getter for client port
+	 * \brief	Getter for client port
 	 */
 	char* get_service();
 
@@ -39,7 +39,7 @@ public:
 	 * \fn		unsigned short get_sin_port
 	 * \param	N/A
 	 * \return	Returns the client socket port
-	 * \brief   Getter for client socket port
+	 * \brief	Getter for client socket port
 	 */
 	unsigned short get_sin_port();
 
@@ -47,8 +47,8 @@ public:
 	 * \fn		int set_name_info
 	 * \param	N/A
 	 * \return	Returns EXIT_FAILURE upon any failures encountered,
-	 *			and EXIT_SUCCESS otherwise
-	 * \brief   Setter for client host name
+	 *		and EXIT_SUCCESS otherwise
+	 * \brief	Setter for client host name
 	 */
 	int set_name_info();
 
@@ -56,8 +56,8 @@ public:
 	 * \fn		int set_ipv4_info
 	 * \param	N/A
 	 * \return	Returns EXIT_FAILURE upon any failures encountered,
-	 *			and EXIT_SUCCESS otherwise
-	 * \brief   Setter for client IP address
+	 *		and EXIT_SUCCESS otherwise
+	 * \brief	Setter for client IP address
 	 */
 	int set_ipv4_info();
 
@@ -65,9 +65,9 @@ public:
 	 * \fn		int close_file_descriptor
 	 * \param	N/A
 	 * \return	Returns EXIT_FAILURE upon any failures encountered,
-	 *			and EXIT_SUCCESS otherwise
-	 * \brief   Closes the client file descriptor when socket connection
-	 *			to client has been lost
+	 *		and EXIT_SUCCESS otherwise
+	 * \brief	Closes the client file descriptor when socket connection
+	 *		to client has been lost
 	 */
 	int close_file_descriptor();
 
@@ -76,38 +76,38 @@ public:
 private:
 
 	/**
-	 * \brief   SocketServer needs to access some private members of SocketClient
+	 * \brief	SocketServer needs to access some private members of SocketClient
 	 */
 	friend class SocketServer;
 
 	/**
 	 * \var		socklen_t socket_address_length
-	 * \brief   Size of the client's socket address
+	 * \brief	Size of the client's socket address
 	 */
 	socklen_t socket_address_length;
 
 	/**
 	 * \var		sockaddr_in socket_address
-	 * \brief   Socket address of the client
+	 * \brief	Socket address of the client
 	 */
 	sockaddr_in socket_address;
 
 	/**
 	 * \var		int file_descriptor
-	 * \brief   Identifier for the client
+	 * \brief	Identifier for the client
 	 */
 	int file_descriptor;
 
 	/**
 	 * \var		char host_name[NI_MAXHOST]
-	 * \brief   Host name of the client (if host name cannot be resolved
-	 *			then this will hold the IP address)
+	 * \brief	Host name of the client (if host name cannot be resolved
+	 *		then this will hold the IP address)
 	 */
 	char host_name[NI_MAXHOST];
 
 	/**
 	 * \var		char service[NI_MAXSERV]
-	 * \brief   Port of the client's socket connection
+	 * \brief	Port of the client's socket connection
 	 */
 	char service[NI_MAXSERV];
 };

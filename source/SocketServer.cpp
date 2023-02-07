@@ -36,7 +36,7 @@
 /**
  * \struct	xml_string_writer
  * \brief	Used for printing XML trees. Referenced from
- *			pugixml's manual
+ *		pugixml's manual
  */
 struct xml_string_writer : pugi::xml_writer
 {
@@ -123,9 +123,9 @@ int SocketServer::bind_tcp_ipv4() {
 
 /**
  * Set the socket to listen
- *		- SOMAXCONN defines the maximum length to which the queue of pending
- *		  connections for sockfd may grow. It can be viewed on Linux machines with:
- *			cat /proc/sys/net/core/somaxconn
+ *	- SOMAXCONN defines the maximum length to which the queue of pending
+ *	  connections for sockfd may grow. It can be viewed on Linux machines with:
+ *	  cat /proc/sys/net/core/somaxconn
  */
 int SocketServer::mark_passive() {
 	int return_value;
@@ -134,7 +134,7 @@ int SocketServer::mark_passive() {
 	 *	- SOMAXCONN defines the maximum length to which the queue of pending
 	 *	  connections for sockfd may grow. It can be viewed on Debian machines with:
 	 * 
-	 *		cat /proc/sys/net/core/somaxconn
+	 *	cat /proc/sys/net/core/somaxconn
 	 */
 	return_value = listen(file_descriptor, SOMAXCONN);
 
