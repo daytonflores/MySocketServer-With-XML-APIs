@@ -1,11 +1,11 @@
-#ifndef _MYSOCKETCLIENT_H_
-#define _MYSOCKETCLIENT_H_
+#ifndef _SOCKETCLIENT_H_
+#define _SOCKETCLIENT_H_
 
 /**
- * \class	MySocketClient
+ * \class	SocketClient
  * \brief	Used to abstract data about the client
  */
-class MySocketClient {
+class SocketClient {
 
 
 
@@ -17,7 +17,7 @@ public:
 	 * \return	N/A
 	 * \brief   No parameters passed
 	 */
-	MySocketClient();
+	SocketClient();
 
 	/**
 	 * \fn		char* get_host_name
@@ -76,9 +76,9 @@ public:
 private:
 
 	/**
-	 * \brief   MySocketServer needs to access some private members of MySocketClient
+	 * \brief   SocketServer needs to access some private members of SocketClient
 	 */
-	friend class MySocketServer;
+	friend class SocketServer;
 
 	/**
 	 * \var		socklen_t socket_address_length

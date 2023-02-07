@@ -10,8 +10,8 @@
 
 #include "../include/pugiconfig.hpp"
 #include "../include/pugixml.hpp"
-#include "../include/MySocketClient.h"
-#include "../include/MySocketServer.h"
+#include "../include/SocketClient.h"
+#include "../include/SocketServer.h"
 
 /**
  * \def		TCP_PROTOCOL
@@ -48,35 +48,35 @@ struct xml_string_writer : pugi::xml_writer
 	}
 };
 
-std::string MySocketServer::get_address() {
+std::string SocketServer::get_address() {
 	return address;
 }
 
-int MySocketServer::get_port() {
+int SocketServer::get_port() {
 	return port;
 }
 
-int MySocketServer::set_address(std::string _address) {
+int SocketServer::set_address(std::string _address) {
 	address = _address;
 
 	return EXIT_SUCCESS;
 }
 
-int MySocketServer::set_port(int _port) {
+int SocketServer::set_port(int _port) {
 	port = _port;
 
 	return EXIT_SUCCESS;
 }
 
-int MySocketServer::get_bytes_received() {
+int SocketServer::get_bytes_received() {
 	return bytes_received;
 }
 
-int MySocketServer::get_bytes_sent() {
+int SocketServer::get_bytes_sent() {
 	return bytes_sent;
 }
 
-int MySocketServer::create_tcp_ipv4() {
+int SocketServer::create_tcp_ipv4() {
 	int return_value;
 
 	/**
@@ -98,7 +98,7 @@ int MySocketServer::create_tcp_ipv4() {
 	return return_value;
 }
 
-int MySocketServer::bind_tcp_ipv4() {
+int SocketServer::bind_tcp_ipv4() {
 	int return_value;
 
 	/**
@@ -127,7 +127,7 @@ int MySocketServer::bind_tcp_ipv4() {
  *		  connections for sockfd may grow. It can be viewed on Linux machines with:
  *			cat /proc/sys/net/core/somaxconn
  */
-int MySocketServer::mark_passive() {
+int SocketServer::mark_passive() {
 	int return_value;
 
 	/**
@@ -148,7 +148,7 @@ int MySocketServer::mark_passive() {
 	return return_value;
 }
 
-int MySocketServer::accept_client(MySocketClient* source) {
+int SocketServer::accept_client(SocketClient* source) {
 	int return_value;
 
 	return_value = accept(file_descriptor, (sockaddr*)(&source->socket_address), &source->socket_address_length);
@@ -164,7 +164,7 @@ int MySocketServer::accept_client(MySocketClient* source) {
 	return return_value;
 }
 
-int MySocketServer::close_file_descriptor() {
+int SocketServer::close_file_descriptor() {
 	int return_value;
 
 	return_value = close(file_descriptor);
@@ -179,7 +179,7 @@ int MySocketServer::close_file_descriptor() {
 	return return_value;
 }
 
-void MySocketServer::receive_request_from_client(MySocketClient* source) {
+void SocketServer::receive_request_from_client(SocketClient* source) {
 	/**
 	 *	- Clear the buffer that holds the request 
 	 *	- Waits in this function until data has been received from client
@@ -196,7 +196,7 @@ void MySocketServer::receive_request_from_client(MySocketClient* source) {
 	}
 }
 
-void MySocketServer::validate_request() {
+void SocketServer::validate_request() {
 	int attributes;
 	int children;
 	request_validated = true;
@@ -311,7 +311,7 @@ void MySocketServer::validate_request() {
 
 }
 
-void MySocketServer::process_request() {
+void SocketServer::process_request() {
 	/**
 	 *	- Clear the response XML tree
 	 *	- If request is not validated then construct the response for bad XML format
@@ -332,7 +332,7 @@ void MySocketServer::process_request() {
 	}
 }
 
-void MySocketServer::send_response_to_client(MySocketClient* source) {
+void SocketServer::send_response_to_client(SocketClient* source) {
 	/**
 	 *	- Send the response to the client and if successful, have the server
 	 *	  print the response
@@ -345,7 +345,7 @@ void MySocketServer::send_response_to_client(MySocketClient* source) {
 	}
 }
 
-std::string MySocketServer::get_printable_xml(pugi::xml_document* xml) {
+std::string SocketServer::get_printable_xml(pugi::xml_document* xml) {
 	/**
 	 *	- Use xml_string_writer struct for generating the XML tree
 	 *	  as a string. Referenced from pugixml's manual
@@ -359,7 +359,7 @@ std::string MySocketServer::get_printable_xml(pugi::xml_document* xml) {
 	return writer.result;
 }
 
-void MySocketServer::command_getplayerinfo() {
+void SocketServer::command_getplayerinfo() {
 	/**
 	 *	- Used to hold the Row node that was just appended to the response
 	 */
@@ -440,7 +440,7 @@ void MySocketServer::command_getplayerinfo() {
 	}
 }
 
-void MySocketServer::command_unknown() {
+void SocketServer::command_unknown() {
 	/**
 	 *	- Used to hold the Row node that was just appended to the response
 	 */
@@ -466,7 +466,7 @@ void MySocketServer::command_unknown() {
 
 }
 
-void MySocketServer::request_not_valid() {
+void SocketServer::request_not_valid() {
 	/**
 	 *	- Used to hold the Row node that was just appended to the response
 	 */

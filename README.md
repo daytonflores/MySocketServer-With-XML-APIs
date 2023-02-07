@@ -1,20 +1,20 @@
-# MySocketServer With XML APIs
+# SocketServer With XML APIs
 
 ## Overview
 
 - This is an object-oriented socket server program. It creates a socket server object that can establish a connection with a socket client. Once connection is established, the client will send XML data on that connection at which point the server will display the XML request, process the request, display the XML response, and then send the XML response back to the client.
 
-- Socket server data and methods are abstracted within MySocketServer class
+- Socket server data and methods are abstracted within SocketServer class
 
-- Socket client data and methods are abstracted within MySocketClient class
+- Socket client data and methods are abstracted within SocketClient class
 
 - XML parsing/handling was done using the open source C++ XML processing library [pugixml](https://github.com/zeux/pugixml)
 
 ## Design Approach
 
-- The approach I took to design this system was to abstract the socket handling + XML methods within 2 objects: MySocketServer and MySocketClient. The reason for this approach was to add a layer of abstraction between handling socket information between server and client as it would improve reusability and enhance ease of integration into a more complex environment. This also sets the program up to potentially handle connections to multiple MySocketClients in the future
-	- MySocketClient only serves as a layer of abstraction for storing all information and methods about the socket client into its own object
-	- MySocketServer serves as a layer of abstraction for managing the socket server and the client it communicates with. Requests "from" the client and responses "to" the client are both stored in here. This is done in order to keep MySocketClient object as just a holder of information that is necessary for the server (since the client is external and the server is the main piece of this program)
+- The approach I took to design this system was to abstract the socket handling + XML methods within 2 objects: SocketServer and SocketClient. The reason for this approach was to add a layer of abstraction between handling socket information between server and client as it would improve reusability and enhance ease of integration into a more complex environment. This also sets the program up to potentially handle connections to multiple SocketClients in the future
+	- SocketClient only serves as a layer of abstraction for storing all information and methods about the socket client into its own object
+	- SocketServer serves as a layer of abstraction for managing the socket server and the client it communicates with. Requests "from" the client and responses "to" the client are both stored in here. This is done in order to keep SocketClient object as just a holder of information that is necessary for the server (since the client is external and the server is the main piece of this program)
 
 ## Important Notes
 
@@ -35,7 +35,7 @@
 	
 - Only 1 client can establish a connection with the server at a time
 
-- Lack of database connection limits the "test player" functionality of the program. For testing purposes, there is exactly 1 test player whose attributes are defined as macros at the top of ```../source/MySocketServer.cpp```
+- Lack of database connection limits the "test player" functionality of the program. For testing purposes, there is exactly 1 test player whose attributes are defined as macros at the top of ```../source/SocketServer.cpp```
 
 - XML requests must be sent to the server as a single line (i.e. no newlines)
 
@@ -50,7 +50,7 @@
 	- For my testing, I use ```netcat``` (installed on my Debian system with ```sudo apt-get install netcat```)
 	- Once server is listening, initiate socket connection to the server ```netcat 127.0.0.1 5000```
 5. Create a valid XML request (as a single line) using the Samples as reference (see Supported Commands below)
-	- Make sure the data being used in the request matches the test player attributes defined as macros at the top of ```../source/MySocketServer.cpp```
+	- Make sure the data being used in the request matches the test player attributes defined as macros at the top of ```../source/SocketServer.cpp```
 6. Observe and validate the XML response (see Test Cases below)
 7. To end the program, close the client by pressing ```CTRL``` + ```C``` in ```netcat```
 	

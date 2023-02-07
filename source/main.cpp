@@ -9,8 +9,8 @@
 
 #include "../include/pugiconfig.hpp"
 #include "../include/pugixml.hpp"
-#include "../include/MySocketClient.h"
-#include "../include/MySocketServer.h"
+#include "../include/SocketClient.h"
+#include "../include/SocketServer.h"
 
 /**
  * \def		DEFAULT_SOCKET_SERVER_ADDR
@@ -54,13 +54,13 @@ int main(int argc, char* argv[]){
 	 * \var		destination
 	 * \brief	Server object to process commands from client
 	 */
-	MySocketServer destination;
+	SocketServer destination;
 
 	/**
 	 * \var		source
 	 * \brief	Client object sending commands to server via socket
 	 */
-	MySocketClient source;
+	SocketClient source;
 
 	/**
 	 * Set Socket Server port and address based on command line arguments

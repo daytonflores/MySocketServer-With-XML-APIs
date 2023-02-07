@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../include/MySocketClient.h"
+#include "../include/SocketClient.h"
 
 /**
  * \def		NI_NONE
@@ -15,25 +15,25 @@
  */
 #define NI_NONE	(0)
 
-MySocketClient::MySocketClient() {
+SocketClient::SocketClient() {
 	socket_address_length = sizeof(socket_address);
 	memset(host_name, 0, NI_MAXHOST);
 	memset(service, 0, NI_MAXSERV);
 }
 
-char* MySocketClient::get_host_name() {
+char* SocketClient::get_host_name() {
 	return host_name;
 }
 
-char* MySocketClient::get_service() {
+char* SocketClient::get_service() {
 	return service;
 }
 
-unsigned short MySocketClient::get_sin_port() {
+unsigned short SocketClient::get_sin_port() {
 	return ntohs(socket_address.sin_port);
 }
 
-int MySocketClient::set_name_info() {
+int SocketClient::set_name_info() {
 	int return_value;
 
 	return_value = getnameinfo((sockaddr*)&socket_address, socket_address_length, host_name, NI_MAXHOST, service, NI_MAXSERV, NI_NONE);
@@ -48,7 +48,7 @@ int MySocketClient::set_name_info() {
 	return return_value;
 }
 
-int MySocketClient::set_ipv4_info() {
+int SocketClient::set_ipv4_info() {
 	char* temp;
 	int return_value;
 
@@ -64,7 +64,7 @@ int MySocketClient::set_ipv4_info() {
 	return return_value;
 }
 
-int MySocketClient::close_file_descriptor() {
+int SocketClient::close_file_descriptor() {
 	int return_value;
 
 	return_value = close(file_descriptor);

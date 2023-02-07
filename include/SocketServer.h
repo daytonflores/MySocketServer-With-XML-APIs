@@ -1,11 +1,11 @@
-#ifndef _MYSOCKETSERVER_H_
-#define _MYSOCKETSERVER_H_
+#ifndef _SOCKETSERVER_H_
+#define _SOCKETSERVER_H_
 
 /**
- * \class	MySocketServer
+ * \class	SocketServer
  * \brief	Used to abstract data about the server along with XML handling
  */
-class MySocketServer {
+class SocketServer {
 
 
 
@@ -91,12 +91,12 @@ public:
 
 	/**
 	 * \fn		int accept_client
-	 * \param	MySocketClient *source
+	 * \param	SocketClient *source
 	 * \return	Returns EXIT_FAILURE upon any failures encountered,
 	 *			and EXIT_SUCCESS otherwise
 	 * \brief   Accepts the socket client connection
 	 */
-	int accept_client(MySocketClient *source);
+	int accept_client(SocketClient *source);
 
 	/**
 	 * \fn		int close_file_descriptor
@@ -110,12 +110,12 @@ public:
 
 	/**
 	 * \fn		void receive_request_from_client
-	 * \param	MySocketClient *source
+	 * \param	SocketClient *source
 	 * \return	N/A
 	 * \brief   Waits in this function until data has been received from client
 	 *			via socket connection
 	 */
-	void receive_request_from_client(MySocketClient *source);
+	void receive_request_from_client(SocketClient *source);
 
 	/**
 	 * \fn		void validate_request
@@ -140,11 +140,11 @@ public:
 
 	/**
 	 * \fn		void send_response_to_client
-	 * \param	MySocketClient *source
+	 * \param	SocketClient *source
 	 * \return	N/A
 	 * \brief   Sends the server's response to the client
 	 */
-	void send_response_to_client(MySocketClient *source);
+	void send_response_to_client(SocketClient *source);
 
 	/**
 	 * \fn		std::string get_printable_xml
@@ -192,12 +192,12 @@ public:
 private:
 
 	/**
-	 * \brief   MySocketClient needs to access some private members of MySocketServer
+	 * \brief   SocketClient needs to access some private members of SocketServer
 	 */
-	friend class MySocketClient;
+	friend class SocketClient;
 
 	/**
-	 * \brief   xml_document needs to access some private members of MySocketServer
+	 * \brief   xml_document needs to access some private members of SocketServer
 	 */
 	friend class pugi::xml_document;
 
